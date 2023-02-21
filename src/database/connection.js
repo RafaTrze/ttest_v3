@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
+const config = require('../../config/config.json')
+const sequelize = new Sequelize(
+  config.development.database, config.development.username, config.development.password, {
+  host: config.development.host,
+  dialect: config.development.dialect
+});
 
-const sequlize = new Sequelize('ttest_v3_development', 'root', '', {
-  host: '127.0.0.1',
-  dialect: 'mysql'
-})
-
-module.exports = sequlize;
+module.exports = sequelize;

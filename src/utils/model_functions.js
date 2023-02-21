@@ -19,4 +19,56 @@ const getBDFriends = async (today_date, option_date) => {
 
 };
 
-module.exports = {getBDFriends};
+const getAllFriends = async () => {
+  const allFriends = await Friend.findAll();
+  return allFriends
+};
+
+const getFriendById = async (ID) => {
+  const friendId = await Friend.findAll({
+    where: {
+      id: ID
+    }
+  })
+  return friendId
+};
+
+const postFriend = async (last_name, first_name, date_of_birth, email) => {
+  await Friend.create({
+    last_name: last_name, 
+    first_name: first_name, 
+    date_of_birth: date_of_birth, 
+    email: email
+  })
+};
+
+const putFriend = async (last_name, first_name, date_of_birth, email, ID) => {
+  await Friend.update({
+    last_name: last_name, 
+    first_name: first_name, 
+    date_of_birth: date_of_birth, 
+    email: email
+  },
+  {
+    where: {
+    id: ID
+    }
+  })
+};
+
+const deleteFriend = async (ID) => {
+  await Friend.destroy({
+    where: {
+      id: ID
+    }
+  })
+};
+
+module.exports = {
+  getBDFriends,
+  getAllFriends,
+  putFriend,
+  getFriendById,
+  postFriend,
+  deleteFriend
+};

@@ -30,8 +30,19 @@ const getIsItSkipYear = () => {
   }
 };
 
+// const getIsEmptyArray = (obj) => {
+//   return JSON.stringify(obj) === '[]'
+// };
+
+const getIsEmptyObject= (obj) => {
+  return Object.keys(obj).length === 0
+};
+
+
 module.exports = {
   getToday,
   sendEmail,
-  getIsItSkipYear
+  getIsItSkipYear,
+  // getIsEmptyArray,
+  getIsEmptyObject
 };
