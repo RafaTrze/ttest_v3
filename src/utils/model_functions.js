@@ -15,12 +15,16 @@ const getBDFriends = async (today_date, option_date) => {
       }
     }
   })
+  logger.info(`${__dirname} ${getBDFriends.name} 200`)
   return bdFriends
 
 };
 
+
+
 const getAllFriends = async () => {
   const allFriends = await Friend.findAll();
+  logger.info(`${__dirname} ${getAllFriends.name} 200`)
   return allFriends
 };
 
@@ -30,6 +34,7 @@ const getFriendById = async (ID) => {
       id: ID
     }
   })
+  logger.info(`${__dirname} ${getFriendById.name} 200`)
   return friendId
 };
 
@@ -40,6 +45,7 @@ const postFriend = async (last_name, first_name, date_of_birth, email) => {
     date_of_birth: date_of_birth, 
     email: email
   })
+  logger.info(`${__dirname} ${postFriend.name} 200`)
 };
 
 const putFriend = async (last_name, first_name, date_of_birth, email, ID) => {
@@ -54,6 +60,7 @@ const putFriend = async (last_name, first_name, date_of_birth, email, ID) => {
     id: ID
     }
   })
+  logger.info(`${__dirname} ${putFriend.name} 200`)
 };
 
 const deleteFriend = async (ID) => {
@@ -62,6 +69,7 @@ const deleteFriend = async (ID) => {
       id: ID
     }
   })
+  logger.info(`${__dirname} ${deleteFriend.name} 200`)
 };
 
 module.exports = {

@@ -8,13 +8,16 @@ ttestRouter = express.Router();
 ttestRouter.get('/', (req, res, next) => {
   const today = getToday();
   const path = '/'
+
   if (req.path === path) {
-    logger.info('200')
+    logger.info(`${req.method} 204`)
     res.status(200).send(`ttest_v3 \n Today is: ${today}`)
+
   }
   else {
-    logger.info('404')
-    res.status(404).send()
+    const error = new Error('404')
+    error.status = 404;
+    return next(error, req)
   }
   next()
 });

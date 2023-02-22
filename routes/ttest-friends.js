@@ -1,7 +1,7 @@
 const express = require('express');
 
 const logger = require('../src/utils/logger');
-const {getIsEmptyObject, getToday} = require('../src/utils/support_functions');
+const {getIsEmptyObject, getIsEmptyObjectKeyValue, getToday} = require('../src/utils/support_functions');
 const {getAllFriends, getBDFriends, getFriendById, putFriend, postFriend, deleteFriend} = require('../src/utils/model_functions')
 
 friendsRouter = express.Router();
@@ -12,15 +12,17 @@ friendsRouter.get('/', async (req, res, next) => {
   const isEmpty = getIsEmptyObject(friends);
   
   if (friends && !isEmpty) {
-    logger.info('200')
+    logger.info(`${req.method} 200`)
     res.status(200).send(friends)
   } else if (isEmpty) {
-    logger.info('204')
+    logger.info(`${req.method} 204`)
     res.status(204).send()
   }
   else {
-    logger.info('404')
-    res.status(404).send('404')
+    const error = new Error('404')
+    error.status = 404
+    return next(error, req)
+
   }
   next()
 });
@@ -31,15 +33,19 @@ friendsRouter.get('/bd', async (req, res, next) => {
   const bdFriends = await getBDFriends(today);
   const isEmpty = getIsEmptyObject(bdFriends)
 
-  if (bdFriends && !isEmpty) {
-    logger.info('200')
-    res.status(200).send(bdFriends)
+  if (!isEmpty) {
+    logger.info(`${req.method} 200`)
+    return res.status(200).send(bdFriends)
+
   } else if (isEmpty) {
-    logger.info('204')
-    res.status(204).send()
+    logger.info(`${req.method} 204`)
+    return res.status(204).send()
+
   } else {
-    logger.info('404')
-    res.status(404).send('404')
+    const error = new Error('404')
+    error.status = 404;
+    return next(error, req)
+
   }
   next()
 });
@@ -47,17 +53,19 @@ friendsRouter.get('/bd', async (req, res, next) => {
 // GET friend by id
 friendsRouter.get('/:id', async (req, res, next) => {
   const id = req.params.id;
-  logger.info(req.params.id)
   const friendById = await getFriendById(id);
   const isEmpty = getIsEmptyObject(friendById);
 
   if (!isEmpty) {
-    logger.info('200')
+    logger.info(`${req.method} 200`)
     res.status(200).send(friendById)
+
   }
   else {
-    logger.info('404')
-    res.status(404).send('404')
+    const error = new Error('404')
+    error.status = 404;
+    return next(error, req)
+
   }
   next()
 });
@@ -65,16 +73,23 @@ friendsRouter.get('/:id', async (req, res, next) => {
 // POST friend
 friendsRouter.post('/', (req, res, next) => {
   const newFriend = req.query
+  const isEmptyKeyValue = getIsEmptyObjectKeyValue(newFriend)
   
-  if (newFriend.last_name && newFriend.first_name && newFriend.date_of_birth && newFriend.email) {
-    
+  // check if any key vale pairs are empty
+  if (!isEmptyKeyValue) {
     postFriend(newFriend.last_name, newFriend.first_name, newFriend.date_of_birth, newFriend.email)
-    logger.info('200')
-    res.status(200).send('200')
+    logger.info(`${req.method} 201`)
+    res.status(200).send('201')
+
+  } else if(isEmptyKeyValue) {
+    const error = new Error('400')
+    error.status = 400
+    return next(error, req)
 
   } else {
-    logger.info('400')
-    res.status(400).send('400')
+    const error = new Error('500')
+    return next(error, req)
+
   }
   next()
 });
@@ -85,20 +100,29 @@ friendsRouter.put('/:id', async (req, res, next) => {
   const id = req.params.id
   const friendId = await getFriendById(id)
   const isEmpty = getIsEmptyObject(friendId)
+  const isEmptyKeyValue = getIsEmptyObjectKeyValue(updateFriend)
   
-  // check for empty object and empty keys
-  
-  if (!isEmpty && updateFriend.last_name && updateFriend.first_name && updateFriend.date_of_birth && updateFriend.email) {
-    putFriend(updateFriend.last_name, updateFriend.first_name, updateFriend.date_of_birth, updateFriend.email, id)
-    logger.info('200')
+  // check for empty object and empty keys value pairs
+  if (!isEmpty && !isEmptyKeyValue) {
+    await putFriend(updateFriend.last_name, updateFriend.first_name, updateFriend.date_of_birth, updateFriend.email, id)
+    logger.info(`${req.method} 200`)
     res.status(200).send('200')
+
   } else if (isEmpty) {
-    logger.info('404')
-    res.status(400).send('404')
+    const error = new Error('404')
+    error.status = 404
+    return next(error, req)
+
   }
-  else {
-    logger.info('400')
-    res.status(400).send('400')
+  else if (isEmptyKeyValue) {
+    const error = new Error('400')
+    error.status = 400
+    return next(error, req)
+
+  } else {
+    const error = new Error('500')
+    return next(error, req)
+
   }
   next()
 });
@@ -111,12 +135,19 @@ friendsRouter.delete('/:id', async (req, res, next) => {
   
   if (!isEmpty) {
     deleteFriend(id)
-    logger.info('204')
+    logger.info(`${req.method} 204`)
     res.status(204).send()
+
   }
-  else {
-    logger.info('404')
-    res.status(404).send('404')
+  else if (isEmpty) {
+    const error = new Error('404')
+    error.status = 404;
+    return next(error, req)
+
+  } else {
+    const error = new Error('500')
+    return next(error, req)
+
   }
   next()
 });

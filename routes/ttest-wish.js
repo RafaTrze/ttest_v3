@@ -9,19 +9,23 @@ wishRouter = express.Router();
 wishRouter.get('/', (req, res, next) => {
   const email = 'email'
   const sms = 'sms'
+
   if (req.query.service === email) {
     wishEmail()
-    logger.info('200')
+    logger.info(`${req.method} 200`)
     res.status(200).send('200')
+
   }
   else if (req.query.service === sms) {
     wishEmail()
-    logger.info('200')
+    logger.info(`${req.method} ${req.path} 200`)
     res.status(200).send('200')
+
   }
   else {
-    logger.info('404')
-    res.status(404).send('404')
+    const error = new Error('404')
+    error.status = 404;
+    return next(error, req)
   }
   next()
 });

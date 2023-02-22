@@ -32,6 +32,7 @@ const wishEmail = async () => {
       })
     }
   }
+  logger.info(`${__dirname} ${wishEmail.name} 200`)
 };
 
 module.exports = {
